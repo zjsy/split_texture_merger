@@ -4,39 +4,33 @@ var Jimp = require("jimp");
 
 var srcFile = process.argv[2];
 if (!srcFile) {
-	console.error("Please input json file");
+	console.error("Please input atlas file");
 }
-if (!srcFile.endsWith(".json")) {
-	srcFile += ".json";
+if (!srcFile.endsWith(".atlas")) {
+	srcFile += ".atlas";
 }
-
 var srcDir = path.dirname(srcFile);
 
-var filename = path.basename(srcFile,'.json')
-
-var outputDir = process.argv[3] || srcDir + "/output/" + filename;
+var outputDir = process.argv[3] || srcDir + "/output";
 
 console.log("run: " + srcFile + " " + outputDir)
-//{"offY":7,"offX":5,"sourceH":128,"sourceW":128,"w":117,"h":117,"y":621,"x":2}
+//"RoadbankerSix.png":{"frame":{"h":20,"idx":0,"w":20,"x":673,"y":62},"sourceSize":{"h":20,"w":20},"spriteSourceSize":{"x":0,"y":0}},
 var writeImage = function (p, k, v, cb) {
-    var image = new Jimp(v.sourceW, v.sourceH);
+	let frame = v.frame
+	let sourceSize = v.sourceSize
+    var image = new Jimp(sourceSize.w, sourceSize.h);
     image.rgba(true);
-    image.background(0);
-    var dstX = v.offX;
-    var dstY = v.offY;
-    var srcX = v.x;
-    var srcY = v.y;
-    var srcW = v.w;
-    var srcH = v.h;
+	image.background(0);
+	// 位置暂时都默认为0
+    var dstX = 0;
+	var dstY = 0;
+    var srcX = frame.x;
+    var srcY = frame.y;
+    var srcW = frame.w;
+    var srcH = frame.h;
     image.blit(p, dstX, dstY, srcX, srcY, srcW, srcH);
 
-	// 如果带后缀，用后缀，如果没后缀，TODO: 但是现在只时判断了_png后缀
-	// 新版本似乎都是不带后缀的
-	if (k.indexOf('_png') !== -1) {
-		var fileName = k.replace(/_([^_]*)$/, ".$1");
-	} else { 
-		fileName = k+'.png'
-	}
+	var fileName = k;//k.replace(/_([^_]*)$/, ".$1");
 	image.write(outputDir + "/" + fileName);
 	cb();
 }
@@ -65,8 +59,8 @@ fs.readFile(srcFile, (err, data) => {
 	if (!sheet) {
 		return;
 	}
-
-	var filePath = srcDir + "/" + sheet.file;
+	outputDir = srcDir + '/output/' + sheet.meta.prefix
+	var filePath = srcDir + "/" + sheet.meta.image;
 	Jimp.read(filePath).then(function (p) {
 		runMapAsync(p, sheet.frames, writeImage);
 	}).catch(function (err) {
