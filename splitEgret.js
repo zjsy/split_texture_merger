@@ -3,20 +3,25 @@ var path = require("path");
 var Jimp = require("jimp");
 
 var srcFile = process.argv[2];
+
 if (!srcFile) {
 	console.error("Please input json file");
 }
+
 if (!srcFile.endsWith(".json")) {
 	srcFile += ".json";
 }
 
 var srcDir = path.dirname(srcFile);
 
+console.log(srcDir)
+
 var filename = path.basename(srcFile,'.json')
 
 var outputDir = process.argv[3] || srcDir + "/output/" + filename;
 
-console.log("run: " + srcFile + " " + outputDir)
+// console.log("run: " + srcFile + " " + outputDir)
+
 //{"offY":7,"offX":5,"sourceH":128,"sourceW":128,"w":117,"h":117,"y":621,"x":2}
 var writeImage = function (p, k, v, cb) {
     var image = new Jimp(v.sourceW, v.sourceH);
@@ -67,6 +72,7 @@ fs.readFile(srcFile, (err, data) => {
 	}
 
 	var filePath = srcDir + "/" + sheet.file;
+	// console.log(filePath)
 	Jimp.read(filePath).then(function (p) {
 		runMapAsync(p, sheet.frames, writeImage);
 	}).catch(function (err) {
