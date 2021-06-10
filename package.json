@@ -2,9 +2,9 @@
   "name": "extract",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "splitEgret.js",
   "scripts": {
-    "debug": "node index.js",
+    "debug": "node splitAtlas.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
